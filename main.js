@@ -27,8 +27,8 @@ $(document).ready(function () {
 
 function isReasultDefault() {
   const defaultSeverAPI =
-    "http://api.weatherapi.com/v1/current.json?key=9683829700c84a269be72831231808&q=ha noi&aqi=yes";
-  $.get(defaultSeverAPI, function (datas, status) {
+    "http://api.weatherapi.com/v1/current.json?key=9683829700c84a269be72831231808&q=ha noi&aqi=no";
+  $.get(defaultSeverAPI, function (datas) {
     isReasultWeather(datas);
   })
 }
@@ -36,27 +36,37 @@ function isReasultDefault() {
 
 //Logic
 function isReasult() {
-  let severAPI = "http://api.weatherapi.com/v1/current.json?key=9683829700c84a269be72831231808&q= &aqi=yes";
-
+  let severAPI = "http://api.weatherapi.com/v1/current.json?key=9683829700c84a269be72831231808&q= &aqi=no";
   let dataUser = $(".inputLocation").val();
   let weatherApi = severAPI.replace(" ", dataUser);
 
-  $.get(weatherApi, function (datas, status) {
+  $.get(weatherApi, function (datas,status) {
 
-    isReasultWeather(datas);
+    isReasultWeather(datas,status)
+
+  }).fail(function(){
+    $(".messageError-content").show(500);
+    $(document).ready(function () {
+    setTimeout(hideMessageError,5000)
+    })
+    const hideMessageError = function(){
+      $(".messageError-content").hide(500);
+    }
+ 
   })
 }
 
-function isReasultWeather(values) {
-  const isLocation = values.location.name;
+function isReasultWeather(values,status) {
+  let  isLocation = values.location.name;
   const isfeelslike_c = values.current.feelslike_c;
   const ishumidity = values.current.humidity;
   const isuvIndex = values.current.uv;
   const iswind_kph = values.current.wind_kph;
-  const istemperature = values.current.temp_c
+  const istemperature = values.current.temp_c;
+ 
+
   const isDate = new Date();
   const isHours = isDate.getHours();
-  console.log(values);
   const isToday =
     isHours +
     ":" +
@@ -67,9 +77,7 @@ function isReasultWeather(values) {
     (isDate.getMonth() + 1) +
     "-" +
     isDate.getFullYear();
-
-
-  //display data
+  
   $(".location").html(function () {
     return isLocation;
   });
@@ -84,19 +92,19 @@ function isReasultWeather(values) {
   });
 
   $(".weather-uvIndex").html(function () {
-    return " Chỉ số UV:"+isuvIndex;
+    return " Chỉ số UV:" + isuvIndex;
   });
 
   $(".weather-humidity").html(function () {
     return "Độ ẩm:" + ishumidity + "%";
   });
   $(".weather-temperature").html(function () {
-    return "Nhiệt độ:"+ istemperature + "°C";
+    return "Nhiệt độ:" + istemperature + "°C";
   })
   $(".wind_speed").html(function () {
     return "Gió:" + iswind_kph + "  km/h";
   })
-
+  $(".messageError-content").hide();
 
   if (isHours >= 19 || isHours <= 4) {
     $(".display-data").html(function () {
